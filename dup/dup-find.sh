@@ -276,10 +276,24 @@ function dup-gitify () {
     return 0
 }
 
-function dup-show (){
+function dup-show-raw (){
     dup--init-maybe || return 0
     dup-compare $(command ls -1 $DUP_HOME/md5/*.md5)
     return 0
+}
+
+function dup-show () {
+    # Slow implementation !
+    # But does the job ;-)
+    local prev="a"
+    for line in $(dup-show-raw | awk '{printf ("%s|%s\n", $1,$2)}')
+    do
+        id=$(echo $line | cut -d'|' -f1)
+        file=$(echo $line | cut -d'|' -f2)
+        [ ! "$id" == "$prev" ] && echo " "
+        echo $id $file
+        prev=$id
+    done
 }
 
 function dup-compare () {
