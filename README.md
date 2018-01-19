@@ -1,0 +1,1 @@
+When uselessness is proactive
