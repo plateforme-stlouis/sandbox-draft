@@ -221,6 +221,7 @@ function dup-index () {
     done
     if [ $is_error -eq 1 ]
     then
+        echo ""
         echo "Warning: filename containing quotes (' or \")."
         echo "Warning: you should rename it because it is a wrong habit."
     fi
@@ -350,4 +351,14 @@ function dup-rm () {
     rm -i $DUP_HOME/md5/${1}.md5
     rm -i $DUP_HOME/tps/${1}.tps
     return 0
+}
+
+function dup-search-dir () {
+    dup--init-maybe || return 0
+    dup-ls-dirs | grep -e $1
+}
+
+function dup-search-file () {
+    dup--init-maybe || return 0
+    dup-ls | grep -e $1
 }
