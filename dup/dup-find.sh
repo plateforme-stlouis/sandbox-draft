@@ -193,7 +193,9 @@ function dup-index () {
     md5=md5/${name}.md5
     tps=tps/${name}.tps
 
-    echo " Hash (md5sum)..."
+    echo " o Hash (checksum)..."
+    # cksum should hash faster, but it practically seems not.
+    # but the bottleneck seems the IO: read the file!
     if [ $DUP_PARALLEL -eq 1 ]
     then
         echo "  ...Running in parallel..."
@@ -206,7 +208,7 @@ function dup-index () {
     cat $DUP_TMP | sort > $DUP_HOME/$md5
     dup--rm-tmp
 
-    echo " Change time (stat)..."
+    echo " o Change time (stat)..."
     # This *UGLY* for-loop because quote in filename
     # and I did not find a way,
     # e.g., awk | xargs -0 which should fix the issue
@@ -222,7 +224,7 @@ function dup-index () {
     if [ $is_error -eq 1 ]
     then
         echo ""
-        echo "Warning: filename containing quotes (' or \")."
+        echo "Warning: filename containing quotes (' or \") or spaces."
         echo "Warning: you should rename it because it is a wrong habit."
     fi
 
