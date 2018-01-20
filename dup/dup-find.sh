@@ -364,3 +364,9 @@ function dup-search-file () {
     dup--init-maybe || return 0
     dup-ls | grep -e $1
 }
+
+function dup-version () {
+    echo "It is too simple to have a version number."
+    echo ""
+    dup-help
+}
