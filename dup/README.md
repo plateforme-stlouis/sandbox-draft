@@ -15,7 +15,7 @@ The file MD5 indexes are stored under `$DUP_HOME` to browse duplicates.
 ### Simple install
 Fetch the `dup-find.sh` file and source it. Done :-)
 ```bash
-    wget https://raw.githubusercontent.com/plateforme-stlouis/scripts/master/dup/dup-find.sh
+    wget https://raw.githubusercontent.com/plateforme-stlouis/sandbox-draft/master/dup/dup-find.sh
     source dup-find.sh
     dup-version
 ```
