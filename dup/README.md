@@ -26,6 +26,8 @@ Index your home directory:
 ```bash
     dup-init
     for dir in $(command ls -d1 $HOME/*) ; do dup-index $dir ; done
+
+    dup-show
 ```
 
 If GNU parallel is installed, then parallelize a bit some internal with the
@@ -35,4 +37,6 @@ option `-p`:
     do
         dup-index $dir -p
     done
+
+    dup-show
 ```
