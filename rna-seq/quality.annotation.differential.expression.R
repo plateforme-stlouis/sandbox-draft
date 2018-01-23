@@ -4,9 +4,10 @@ library(Glimma)
 library(gplots)
 library(RColorBrewer)
 library(org.Hs.eg.db)
+library(xlsx)
 
 # read count matrix
-expr = load(...)
+expr = load("read.counts.RData")
 
 myCPM <- cpm(expr)
 thresh <- myCPM > 0.5
@@ -29,8 +30,8 @@ title("Boxplots of logCPMs (unnormalised)")
 
 
 # define here your groups of interest
-gpe1 = c(...)
-gpe2 = c(...)
+gpe1 = c(1, 1, 0, 0)
+gpe2 = c(0, 0, 1, 1)
 
 design = model.matrix(~ 0 + gpe1 + gpe2)
 v <- voom(y, design, plot = TRUE)
@@ -45,5 +46,8 @@ ann <- select(org.Hs.eg.db, keys=rownames(fit.cont), columns=c("SYMBOL"), keytyp
 fit.cont$genes <- ann
 
 # result
-topTable(fit.cont,coef="CD4NaiveVsMemory",sort.by="logFC", n=50)
+top = topTable(fit.cont,coef="Gpe1vsGpe2",sort.by="logFC", n=50)
+write.xlsx(data.frame(top), "toptable.xlsx")
+pdf("volcano.pdf")
 volcanoplot(fit.cont, coef=1, highlight=100, names=fit.cont$genes$SYMBOL)
+dev.off()
