@@ -10,6 +10,7 @@ It will create the directory `data-ftp.ebi.ac.uk` with 4 FASTQ files.
 
 2. Install Miniconda and add Bioconda
 ```bash
+    curl -C - -O https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
     bash Miniconda3-latest-Linux-x86_64.sh
     conda config --add channels r
     conda config --add channels conda-forge
