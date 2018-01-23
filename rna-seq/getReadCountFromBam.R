@@ -42,7 +42,7 @@ se <- summarizeOverlaps(features=ebg,
 print("Done.")
 
 expr = assay(se)
-write.table(expr, "read.counts.csv")
+save(expr, file="read.counts.RData")
 
 setwd("..")
 print(getwd())
