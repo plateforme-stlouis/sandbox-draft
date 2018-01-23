@@ -36,7 +36,7 @@ Then, you can return whenever to this environment with the command
 
 4. Install locally the R dependencies
 ```bash
-    Rscript --no-intit-file install-deps.R
+    Rscript --no-init-file install-deps.R
     Rscript check-deps.R
 ```
 If there is not enough room in the folder `/tmp/`, then try `bash
