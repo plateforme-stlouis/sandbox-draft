@@ -10,3 +10,7 @@ library(Glimma)
 library(gplots)
 library(RColorBrewer)
 library(org.Hs.eg.db)
+
+
+print("Libraries loaded.")
+print("Ok.")
