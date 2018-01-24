@@ -4,6 +4,8 @@
 
 DUP_HOME=$HOME/duplicates
 DUP_DB=$DUP_HOME/all-indexed-dir.db
+DUP_DUP=$DUP_HOME/current-duplicates.db
+DUP_ISUP=$DUP_HOME/is-db-updated.bool
 
 DUP_BS=1M
 DUP_COUNT=10
@@ -83,10 +85,11 @@ function dup-init () {
             command cd $DUP_HOME
             git init
         fi
-        touch $DUP_DB
+        touch $DUP_DB $DUP_DUP
+        echo 0 > $DUP_ISUP
         if [ ! $DUP_GIT -eq 0 ]
         then
-            git add $DUP_DB
+            git add $DUP_DB $DUP_DUP
             git commit -m "init"
             command cd $from
         fi
@@ -219,6 +222,7 @@ function dup-index () {
     cat $DUP_TMP | sort > $DUP_HOME/$md5
     dup--rm-tmp
 
+
     echo " o Change time (stat)..."
     # This *UGLY* for-loop because quote in filename
     # and I did not find a way,
@@ -249,6 +253,11 @@ function dup-index () {
         git commit -am "$name"
         command cd $from
     fi
+
+    echo ""
+    echo "Dot not forget to update the Database: dup-update"
+    #echo ""
+    echo 0 > $DUP_ISUP
 
     return 0
 }
@@ -292,7 +301,15 @@ function dup-gitify () {
 
 function dup-show-raw (){
     dup--init-maybe || return 0
-    dup-compare $(command ls -1 $DUP_HOME/md5/*.md5)
+    # dup-compare $(command ls -1 $DUP_HOME/md5/*.md5)
+    if [ $(cat $DUP_ISUP) -eq "0" ]
+    then
+        dup-update
+        echo ""
+        echo "Rerun dup-show for clearer ouput (will be fast!)"
+        echo ""
+    fi
+    cat $DUP_DUP
     return 0
 }
 
@@ -314,7 +331,31 @@ function dup-compare () {
     for file in $*
     do
         cat $file
-    done | sort | uniq -w32 -dD
+    done | sort | uniq | uniq -w32 -dD
+    # first uniq to remove file indexed once in folder,
+    # and then in some sub-folder
+    # second uniq keep the same hash
+    return 0
+}
+
+function dup-update () {
+    dup--init-maybe || return 0
+    echo "Update the all Database"
+    echo " + Sort"
+    echo " + Unify"
+    echo " + Rehash for safety"
+    echo " = Be patient..."
+    dup--rm-tmp
+    dup-compare $(command ls -1 $DUP_HOME/md5/*.md5) \
+        | tr -s ' ' '|' \
+        | cut -d'|' -f2 \
+        | xargs md5sum   \
+        | sort     \
+        | uniq -w32 -dD > $DUP_TMP
+    echo 1 > $DUP_ISUP
+    # Ugly hack
+    cat $DUP_TMP > $DUP_DUP
+    dup--rm-tmp
     return 0
 }
 
