@@ -5,6 +5,9 @@
 DUP_HOME=$HOME/duplicates
 DUP_DB=$DUP_HOME/all-indexed-dir.db
 
+DUP_BS=1M
+DUP_COUNT=10
+
 # +0 means as many as possible
 # (see GNU parallel, option -j)
 DUP_NTHREADS=+0
@@ -12,12 +15,13 @@ DUP_NTHREADS=+0
 DUP_GIT=0
 
 DUP_TMP=$DUP_HOME/tmp-remove.that
+DUP_LST=$DUP_HOME/lst-remove.that
+DUP_HSH=$DUP_HOME/hsh-remove.that
 
 function dup--rm-tmp () {
-    if [ -f $DUP_TMP ]
-    then
-        command rm -I $DUP_TMP
-    fi
+    [ -f $DUP_TMP ] && command rm -I $DUP_TMP
+    [ -f $DUP_LST ] && command rm -I $DUP_LST
+    [ -f $DUP_HSH ] && command rm -I $DUP_HSH
     return 0
 }
 
@@ -202,8 +206,15 @@ function dup-index () {
         find $dir ! -empty ! -type l -type f -print0 \
             | parallel --progress -j$DUP_NTHREADS -0 md5sum > $DUP_TMP
     else
-        find $dir ! -empty ! -type l -type f -print0 \
-            | xargs -0 md5sum > $DUP_TMP
+        # find $dir ! -empty ! -type l -type f -print0 \
+        #     | xargs -0 md5sum > $DUP_TMP
+        find $dir ! -empty ! -type l -type f -print > $DUP_LST
+        for file in $(cat $DUP_LST)
+        do
+            dd status=none if=$file bs=$DUP_BS count=$DUP_COUNT \
+                | md5sum
+        done | tr -s '-' ' ' > $DUP_HSH
+        paste -d ' ' $DUP_HSH $DUP_LST > $DUP_TMP
     fi
     cat $DUP_TMP | sort > $DUP_HOME/$md5
     dup--rm-tmp
