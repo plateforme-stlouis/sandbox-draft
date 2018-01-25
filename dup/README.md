@@ -12,6 +12,17 @@ nothing more. **And the bottleneck is the IO.**
 
 The file MD5 indexes are stored under `$DUP_HOME` to browse duplicates.
 
+
+And after the command `dup-update`, then the file `$DUP_DUP` contains the
+duplicated files.
+
+ - First pass: only `$DUP_BS*$DUP_COUNT`MB is hashed. (`dup-index`)
+ - Second pass: the previous duplicated hashes are fully rehashed. (`dup-update`)
+
+
+**Note:** is it faster than `dup-1` ? (`git co -b one dup-1`)
+
+
 ### Simple install
 Fetch the `dup-find.sh` file and source it. Done :-)
 ```bash
@@ -26,6 +37,7 @@ Index your home directory:
 ```bash
     dup-init
     for dir in $(command ls -d1 $HOME/*) ; do dup-index $dir ; done
+    dup-update # Should take some time
 
     dup-show
 ```

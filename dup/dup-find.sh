@@ -212,6 +212,8 @@ function dup-index () {
         # find $dir ! -empty ! -type l -type f -print0 \
         #     | xargs -0 md5sum > $DUP_TMP
         find $dir ! -empty ! -type l -type f -print > $DUP_LST
+        cat $DUP_LST | sed 's/ /\\ /g' > $DUP_TMP
+        mv $DUP_TMP $DUP_LST
         for file in $(cat $DUP_LST)
         do
             dd status=none if=$file bs=$DUP_BS count=$DUP_COUNT \
