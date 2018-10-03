@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # coding: utf-8
 
 
@@ -28,6 +29,7 @@ import sys
 import os
 import re
 
+GUI = False
 LAUNCHER = 'launcher_ALL-STAR.sh'
 
 def helper():
@@ -234,7 +236,10 @@ def generate_script(samples, config):
         print('Warning: {} already exists.'.format(outdir))
         ans = ''
         while not ans in ['y', 'n']:
-            ans = raw_input('Overwrite ? y/n  ')
+            if GUI:
+                ans = 'y'
+            else:
+                ans = raw_input('Overwrite ? y/n  ')
             if ans == 'n':
                 print('Bye.')
                 sys.exit(1)
@@ -259,25 +264,117 @@ def generate_script(samples, config):
     print("\n# Now type in the command-line:\n\tbash {}".format(filename))
 
 
+def run(config):
+    print("Config done.")
+    print(config)
+    samples = compliance_reader(repairer(splitter(get_FASTQ(config))))
+    print(samples)
+    generate_script(samples, config)
+    return
+
 
 if __name__ == "__main__":
 
-    config = parse_args(sys.argv[1:])
-    print(config)
+    if len(sys.argv) == 1:
+        try:
+            print("Import Graphical User Interface...")
+            # GUI tools
+            from Tkinter import Tk
+            from tkFileDialog import askopenfilename, askdirectory
+            from tkMessageBox import showinfo, showerror
 
-    # fastqs = get_FASTQ(config['in'], config['exclude'])
-    # print(fastqs)
+            from Tkinter import *
+        except ImportError:
+            raise ImportError("Tkinter module is required. Try command-line interface.")
+        print("done.\nLaunch GUI...")
+        GUI = True
 
-    # splitteds = splitter(fastqs)
-    # print(splitteds)
+        window = Tk()
+        window.title("Shell Script generator")
 
-    # repairs = repairer(splitteds)
-    # print(repairs)
+        lbl_star   = Label(window, text="star binary file:").grid(column=0, row=0)
+        lbl_genome = Label(window, text="directory genome:").grid(column=0, row=1)
+        lbl_gtf    = Label(window, text="annotation file:").grid(column=0, row=2)
+        lbl_indir  = Label(window, text="Input:").grid(column=0, row=4)
+        lbl_outdir = Label(window, text="Output:").grid(column=0, row=5)
 
-    # compliants = compliance_reader(repairs)
-    # print(compliants)
+        star = Entry(window, width=len(STAR),
+                     textvariable=StringVar(window, STAR))
+        star.grid(column=1, row=0)
 
-    samples = compliance_reader(repairer(splitter(get_FASTQ(config))))
-    print(samples)
+        genome = Entry(window, width=len(GENOME),
+                       textvariable=StringVar(window, GENOME))
+        genome.grid(column=1, row=1)
 
-    generate_script(samples, config)
+        gtf = Entry(window, width=len(GTF),
+                    textvariable=StringVar(window, GTF))
+        gtf.grid(column=1, row=2)
+
+        indir = Entry(window, width=len(os.getcwd()),
+                      textvariable=StringVar(window, os.getcwd()))
+        indir.grid(column=1, row=4)
+
+        outdir = Entry(window, width=len(os.getcwd()) + 6,
+                       textvariable=StringVar(window, os.getcwd() + "/bam/"))
+        outdir.grid(column=1, row=5)
+
+
+        def go():
+            config = { 'in': indir.get(), 'out': outdir.get(), 'exclude': 'subdir3'}
+            run(config)
+            sys.exit(0)
+            return
+
+        btn_start = Button(window, text="Ok", command=go)
+        btn_start.grid(column=1, row=7)
+
+
+        def askfile(entry):
+            filename = askopenfilename()
+            entry.delete(0, END)
+            entry.insert(0, filename)
+            return
+
+        btn_star = Button(window, text="File",
+                          command=lambda: askfile(star)).grid(column=2, row=0)
+        btn_gtf = Button(window, text="File",
+                          command=lambda: askfile(gtf)).grid(column=2, row=2)
+
+        def askdir(entry):
+            filename = askdirectory(initialdir=os.getcwd())
+            entry.delete(0, END)
+            entry.insert(0, filename)
+            return
+
+        btn_genome = Button(window, text="Dir",
+                          command=lambda: askdir(genome)).grid(column=2, row=1)
+        btn_indir = Button(window, text="Dir",
+                          command=lambda: askdir(indir)).grid(column=2, row=4)
+        btn_outdir = Button(window, text="Dir",
+                          command=lambda: askdir(outdir)).grid(column=2, row=5)
+
+
+
+        print("done.")
+        window.mainloop()
+
+        sys.exit(0)
+
+
+    else:
+        config = parse_args(sys.argv[1:])
+        #print(config)
+
+        # fastqs = get_FASTQ(config['in'], config['exclude'])
+        # print(fastqs)
+
+        # splitteds = splitter(fastqs)
+        # print(splitteds)
+
+        # repairs = repairer(splitteds)
+        # print(repairs)
+
+        # compliants = compliance_reader(repairs)
+        # print(compliants)
+
+        run(config)
