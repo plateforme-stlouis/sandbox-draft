@@ -100,9 +100,8 @@ def parse_args(argv):
     except SystemExit:
         print('WRONG: {}'.format(argv))
         sys.exit(1)
-    pwd = os.getcwd()
     for k in ['in', 'out']:
-        config[k] = pwd + '/' + config[k]
+        config[k] = os.path.expanduser(config[k])
     return config
 
 
@@ -232,7 +231,7 @@ def generate_script(samples, config):
     indir, outdir = config['in'], config['out']
 
     filename = outdir + '/' + LAUNCHER
-    if os.path.isdir(outdir):
+    if os.path.exists(outdir):
         print('Warning: {} already exists.'.format(outdir))
         ans = ''
         while not ans in ['y', 'n']:
@@ -248,7 +247,7 @@ def generate_script(samples, config):
             else:
                 print('Just one of these letters: y n')
     else:
-        os.mkdir(outdir)
+        os.makedirs(outdir)
     with open(filename, 'w') as f:
         f.write("#!/usr/bin/bash\n# Automatically generated.\n\n")
 
