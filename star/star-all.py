@@ -197,6 +197,7 @@ def compliance_reader(samples):
 
 
 def launcher(name='foo',
+             outdir='.',
              R1='foo_1.fastq.gz',
              R2='foo_2.fastq.gz',
              cat='zcat'):
@@ -213,7 +214,8 @@ echo '# Sample: {sample}'
 \t\t {R2} \\
 \t --readFilesCommand {cat} \\
 \t --outSAMtype BAM SortedByCoordinate \\
-\t --quantMode GeneCounts
+\t --quantMode GeneCounts \\
+\t --outFileNamePrefix "{outdir}/{sample}"
 
 echo {sample} > done.txt
 
@@ -221,7 +223,8 @@ echo {sample} > done.txt
                sample=name,
                R1=R1,
                R2=R2,
-               cat=cat)
+               cat=cat,
+           outdir=outdir)
 
     return cmd
 
@@ -256,6 +259,7 @@ def generate_script(samples, config):
 
         for sample in samples:
             f.write(launcher(sample.name,
+                             outdir,
                              sample.R1,
                              sample.R2,
                              sample.reader))
