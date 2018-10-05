@@ -220,10 +220,10 @@ echo '# Sample: {sample}'
 echo {sample} > done.txt
 
 """.format(STAR=STAR, GENOME=GENOME, GTF=GTF,
-               sample=name,
-               R1=R1,
-               R2=R2,
-               cat=cat,
+           sample=name,
+           R1=R1,
+           R2=R2,
+           cat=cat,
            outdir=outdir)
 
     return cmd
