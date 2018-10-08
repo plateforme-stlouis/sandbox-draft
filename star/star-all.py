@@ -215,8 +215,10 @@ echo '# Sample: {sample}'
 \t --readFilesCommand {cat} \\
 \t --outSAMtype BAM SortedByCoordinate \\
 \t --quantMode GeneCounts \\
-\t --outFileNamePrefix "{outdir}/{sample}"
+\t --outFileNamePrefix "{outdir}/{sample}_"
 
+sed -e 's/\\t/,/g' {outdir}/{sample}_ReadsPerGene.out.tab.txt \\
+    > {outdir}/{sample}_ReadsPerGene.out.csv
 echo {sample} > done.txt
 
 """.format(STAR=STAR, GENOME=GENOME, GTF=GTF,
