@@ -217,7 +217,7 @@ echo '# Sample: {sample}'
 \t --quantMode GeneCounts \\
 \t --outFileNamePrefix "{outdir}/{sample}_"
 
-sed -e 's/\\t/,/g' {outdir}/{sample}_ReadsPerGene.out.tab.txt \\
+sed -e 's/\\t/,/g' {outdir}/{sample}_ReadsPerGene.out.tab \\
     > {outdir}/{sample}_ReadsPerGene.out.csv
 echo {sample} > done.txt
 
